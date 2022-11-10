@@ -141,7 +141,6 @@ void ShowHelp() {
 }
 
 void MainLoop() {
-	int pos;
 	double start_time, end_time;
 	int built = false;
 
@@ -149,106 +148,152 @@ void MainLoop() {
 	Read_Buffer(input_file);
 	// B+tree initialize
 	BPlusTree_Init();
-	if (buffer != NULL) free(buffer);
-
-  // 0
-	Read_Buffer(input_file);
-	// B+tree initialize
-	BPlusTree_Init();
-	// args
-	built = false;
-	validRecords = 0;
-	// case 1: {
-  int depth = 3;
-	// scanf("%d", &depth);
-		int maxCh = 2;
-		while (1) {
-			int leaves = 1, i;
-			for (i = 0; i < depth; i++) {
-				leaves *= maxCh;
-				if (leaves > TotalRecords) break;
+	while (1) {
+		ShowHelp();
+		int request;
+		scanf("%d", &request);
+		switch (request) {
+			case 0: {
+				// Read data to buffer
+				if (buffer != NULL) free(buffer);
+				Read_Buffer(input_file);
+				// B+tree initialize
+				BPlusTree_Init();
+				// args
+				built = false;
+				validRecords = 0;
+				break;
 			}
-			if (leaves > TotalRecords) break;
-			maxCh++;
-		}
-		printf("Desired depth = %d, calculated maxChildNumber = %d\n", depth, maxCh);
-		BPlusTree_SetMaxChildNumber(maxCh);
-		// 	case 2: {
-		BPlusTree_SetMaxChildNumber(maxCh);
-		// case 3: {
-		built = true;
-		start_time = clock();
-		Read_Data_And_Insert();
-		end_time = clock();
-		printf("Valid Records inserted on B+tree = %d\n", validRecords);
-		printf("Total number of B+tree nodes = %d\n", BPlusTree_GetTotalNodes());
-		printf("Build B+tree costs %lf s\n", (end_time - start_time) / CLOCKS_PER_SEC);
-		// case 4: {
-		int key = 989;
-		// scanf("%d", &key);
-		start_time = clock();
-		BPlusTree_Query_Key(key);
-		end_time = clock();
-		// case 5: {
-		int l=300, r=500;
-		if (l > r) {
-			printf("input illegal\n");
-			return;
-		}
-		start_time = clock();
-		BPlusTree_Query_Range(l, r);
-		end_time = clock();
-		printf("Query on a range, costs %lf s\n", (end_time - start_time) / CLOCKS_PER_SEC);
-		// case 6: {
-		// Modify value on a 253
-		new_key = 989; strcpy(new_st,"xxxxxxx");
-		char* value = (char*)malloc(sizeof(char) * strlen(new_st));
-		strcpy(value, new_st);
-		start_time = clock();
-		pos = BPlusTree_Find(new_key);
-		if (pos != -1) { // found
-			if (File_Modify(pos, new_key, new_st)) { // file modify success
-				BPlusTree_Modify(new_key, value);
-				printf("Modify success.\n");
-			} else {
-				printf("Modify failed, the new value is too long to store in file\n");
+			case 1: {
+				// Set Depth
+				printf("input depth: ");
+				int depth;
+				scanf("%d", &depth);
+				int maxCh = 2;
+				while (1) {
+					int leaves = 1, i;
+					for (i = 0; i < depth; i++) {
+						leaves *= maxCh;
+						if (leaves > TotalRecords) break;
+					}
+					if (leaves > TotalRecords) break;
+					maxCh++;
+				}
+				printf("Desired depth = %d, calculated maxChildNumber = %d\n", depth, maxCh);
+				BPlusTree_SetMaxChildNumber(maxCh);
+				break;
 			}
-		} else {
-			printf("Modify failed, do not have the given key on B+tree.\n");
-		}
-		end_time = clock();
-		printf("Modify value on a key, costs %lf s\n", (end_time - start_time) / CLOCKS_PER_SEC);
-		// case 7: {
-		// Delete value on a key
-		key = 989;
-		start_time = clock();
-		pos = BPlusTree_Find(key);
-		if (pos != -1) { // found
-			File_Delete(pos);
-			BPlusTree_Delete(key);
-			printf("Delete success.\n");
-		} else {
-			printf("Delete failed, do not have the given key on B+tree.\n");
-		}
-		end_time = clock();
-		printf("Delete value on a key, costs %lf s\n", (end_time - start_time) / CLOCKS_PER_SEC);
-		// case 8: {
-		// scanf("%d %s", &new_key, new_st);
-		new_key = 333; strcpy(new_st, "yyyyyyy");
-		value = (char*)malloc(sizeof(char) * new_len);
-		strcpy(value, new_st);
+			case 2: {
+				// Set MaxChildNumber
+				printf("input MaxChildNumber: ");
+				int maxCh;
+				scanf("%d", &maxCh);
+				BPlusTree_SetMaxChildNumber(maxCh);
+				break;
+			}
+			case 3: {
+				// Build B+tree
+				if (built == true) {
+					printf("You have built the B+tree\n");
+					break;
+				}
+				built = true;
+				start_time = clock();
+				Read_Data_And_Insert();
+				end_time = clock();
+				printf("Valid Records inserted on B+tree = %d\n", validRecords);
+				printf("Total number of B+tree nodes = %d\n", BPlusTree_GetTotalNodes());
+				printf("Build B+tree costs %lf s\n", (end_time - start_time) / CLOCKS_PER_SEC);
+				break;
+			}
+			case 4: {
+				// Query on a key
+				printf("input the key: ");
+				int key;
+				scanf("%d", &key);
+				start_time = clock();
+				BPlusTree_Query_Key(key);
+				end_time = clock();
+				printf("Query on a key, costs %lf s\n", (end_time - start_time) / CLOCKS_PER_SEC);
+				break;
+			}
+			case 5: {
+				// Query on a range [l, r]
+				printf("input range [l, r]: ");
+				int l, r;
+				scanf("%d %d", &l, &r);
+				if (l > r) {
+					printf("input illegal\n");
+					break;
+				}
+				start_time = clock();
+				BPlusTree_Query_Range(l, r);
+				end_time = clock();
+				printf("Query on a range, costs %lf s\n", (end_time - start_time) / CLOCKS_PER_SEC);
+				break;
+			}
+			case 6: {
+				// Modify value on a key
+				printf("input (key, value): ");
+				scanf("%d %s", &new_key, new_st);
+				char* value = (char*)malloc(sizeof(char) * strlen(new_st));
+				strcpy(value, new_st);
+				start_time = clock();
+				int pos = BPlusTree_Find(new_key);
+				if (pos != -1) { // found
+					if (File_Modify(pos, new_key, new_st)) { // file modify success
+						BPlusTree_Modify(new_key, value);
+						printf("Modify success.\n");
+					} else {
+						printf("Modify failed, the new value is too long to store in file\n");
+					}
+				} else {
+					printf("Modify failed, do not have the given key on B+tree.\n");
+				}
+				end_time = clock();
+				printf("Modify value on a key, costs %lf s\n", (end_time - start_time) / CLOCKS_PER_SEC);
+				break;
+			}
+			case 7: {
+				// Delete value on a key
+				printf("input key: ");
+				int key;
+				scanf("%d", &key);
+				start_time = clock();
+				int pos = BPlusTree_Find(key);
+				if (pos != -1) { // found
+					File_Delete(pos);
+					BPlusTree_Delete(key);
+					printf("Delete success.\n");
+				} else {
+					printf("Delete failed, do not have the given key on B+tree.\n");
+				}
+				end_time = clock();
+				printf("Delete value on a key, costs %lf s\n", (end_time - start_time) / CLOCKS_PER_SEC);
+				break;
+			}
+			case 8: {
+				printf("input (key, value): ");
+				scanf("%d %s", &new_key, new_st);
+				char* value = (char*)malloc(sizeof(char) * new_len);
+				strcpy(value, new_st);
 
-		pos = BPlusTree_Find(new_key);
-		if (pos == -1) {
-			new_pos = File_Insert(new_key, new_st);
-			keys[key_num++] = new_key;
-			BPlusTree_Insert(new_key, new_pos, value);
-			validRecords++;
-			printf("Insert success.\n");
-		} else {
-			printf("Insert failed, the key already exist.\n");
+				int pos = BPlusTree_Find(new_key);
+				if (pos == -1) {
+					new_pos = File_Insert(new_key, new_st);
+					keys[key_num++] = new_key;
+					BPlusTree_Insert(new_key, new_pos, value);
+					validRecords++;
+					printf("Insert success.\n");
+				} else {
+					printf("Insert failed, the key already exist.\n");
+				}
+				break;
+			}
+			case 9: return;
+			default: break;
 		}
-		// case 9: return;
+	}
 	BPlusTree_Destroy();
 }
 
@@ -284,9 +329,9 @@ void build_test() {
 	int built = false;
 	
 	// MaxChildNumber				
-	// printf("input depth: ");
-	int depth = 3;
-	// scanf("%d", &depth);
+	printf("input depth: ");
+	int depth;
+	scanf("%d", &depth);
 	int maxCh = 2;
 	while (1) {
 		int leaves = 1, i;
@@ -334,9 +379,9 @@ void query_key_test() {
 	// B+tree initialize
 	BPlusTree_Init();
 	// MaxChildNumber				
-	// printf("input depth: ");
-	int depth = 3;
-	// scanf("%d", &depth);
+	printf("input depth: ");
+	int depth;
+	scanf("%d", &depth);
 	int maxCh = 2;
 	while (1) {
 		int leaves = 1, i;
@@ -379,9 +424,9 @@ void query_range_test() {
 	// B+tree initialize
 	BPlusTree_Init();
 	// MaxChildNumber				
-	// printf("input depth: ");
-	int depth = 3;
-	// scanf("%d", &depth);
+	printf("input depth: ");
+	int depth;
+	scanf("%d", &depth);
 	int maxCh = 2;
 	while (1) {
 		int leaves = 1, i;
@@ -419,7 +464,6 @@ void query_range_test() {
 }
 
 void modify_test() {
-	int pos;
 	double start_time, end_time;
 	int built = false;
 
@@ -427,9 +471,9 @@ void modify_test() {
 	// B+tree initialize
 	BPlusTree_Init();
 	// MaxChildNumber				
-	// printf("input depth: ");
-	int depth = 3;
-	// scanf("%d", &depth);
+	printf("input depth: ");
+	int depth;
+	scanf("%d", &depth);
 	int maxCh = 2;
 	while (1) {
 		int leaves = 1, i;
@@ -462,7 +506,7 @@ void modify_test() {
 
 		char* value = (char*)malloc(sizeof(char) * strlen(new_st));
 		strcpy(value, new_st);
-		pos = BPlusTree_Find(new_key);
+		int pos = BPlusTree_Find(new_key);
 		if (pos != -1) { // found
 			if (File_Modify(pos, new_key, new_st)) { // file modify success
 				BPlusTree_Modify(new_key, value);
@@ -480,7 +524,6 @@ void modify_test() {
 }
 
 void delete_test() {
-	int pos;
 	double start_time, end_time;
 	int built = false;
 
@@ -488,9 +531,9 @@ void delete_test() {
 	// B+tree initialize
 	BPlusTree_Init();
 	// MaxChildNumber				
-	// printf("input depth: ");
-	int depth=3;
-	// scanf("%d", &depth);
+	printf("input depth: ");
+	int depth;
+	scanf("%d", &depth);
 	int maxCh = 2;
 	while (1) {
 		int leaves = 1, i;
@@ -518,7 +561,7 @@ void delete_test() {
 	int del_num = 10;
 	for (i = 0; i < del_num; i++) {
 		key = keys[rand() % key_num];
-		pos = BPlusTree_Find(key);
+		int pos = BPlusTree_Find(key);
 		if (pos != -1) { // found
 			File_Delete(pos);
 			BPlusTree_Delete(key);

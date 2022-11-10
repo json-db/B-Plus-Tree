@@ -23,5 +23,5 @@ extern void BPlusTree_Query_Key(int);
 extern void BPlusTree_Query_Range(int, int);
 extern void BPlusTree_Modify(int, void*);
 extern void BPlusTree_Delete(int);
-
+extern int BPlusTree_Find(int key);
 #endif
