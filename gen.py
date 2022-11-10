@@ -27,8 +27,8 @@ def test():
 				d[key] = 1
 				valid += 1
 			if cnt % 10000 == 0:
-				print "cnt = ", cnt
-		print "cnt =", cnt
-		print "valid = ", valid
+				print("cnt = ", cnt)
+		print("cnt =", cnt)
+		print("valid = ", valid)
 
-#gen()
+gen()

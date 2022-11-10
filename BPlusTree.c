@@ -27,7 +27,8 @@ BPlusTreeNode* New_BPlusTreeNode() {
 }
 
 /** Binary search to find the biggest child l that Cur->key[l] <= key */
-inline int Binary_Search(BPlusTreeNode* Cur, int key) {
+// inline int Binary_Search(BPlusTreeNode* Cur, int key) {
+int Binary_Search(BPlusTreeNode* Cur, int key) {
 	int l = 0, r = Cur->key_num;
 	if (key < Cur->key[l]) return l;
 	if (Cur->key[r - 1] <= key) return r - 1;

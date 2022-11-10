@@ -25,7 +25,7 @@ int keys[10000000], key_num;
 /**
 * Read_Buffer(char *input_file) -> buffer
 */
-inline void Read_Buffer(char *input_file) {
+void Read_Buffer(char *input_file) {
 	FILE* fin = fopen(input_file, "rb");
 	if (fin == NULL) {
 		fputs("File Error\n", stderr);
@@ -47,7 +47,7 @@ inline void Read_Buffer(char *input_file) {
 }
 
 /** Read and insert records into B+tree */
-inline void Read_Data_And_Insert() {
+void Read_Data_And_Insert() {
 	int rid = 0;
 	int cur = 0;
 	while (1) {
